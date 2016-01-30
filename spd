@@ -182,11 +182,11 @@ def fix_url(url, current_url=None):
         parsed = urllib.parse.urlparse(url)
         qs = urllib.parse.parse_qs(parsed.query)
         for k, v in qs.items():
-            if type(v) == type([]) and len(v) == 1:
+            if isinstance(v, list) and len(v) == 1:
                 qs[k] = v[0].encode("latin-1")
-        parsed_aslist = list(parsed)
-        parsed_aslist[4] = urllib.parse.urlencode(qs)
-        return urllib.parse.urlunparse(parsed_aslist)
+        parsed_as_list = list(parsed)
+        parsed_as_list[4] = urllib.parse.urlencode(qs)
+        return urllib.parse.urlunparse(parsed_as_list)
     except Exception:
         return url
 
@@ -195,7 +195,7 @@ PARENT_DIRECTORY = re.compile('Parent Directory|<a href="\\.\\./">\\.\\./</a>', 
 LAST_MODIFIED = re.compile('Last modified', re.I)
 
 
-def parse_url(namespace, depth, url, conf=None, count=1):
+def parse_url(depth, url, conf=None, count=1):
     page = read_url(namespace.verbose, None, url)
     if not PARENT_DIRECTORY.search(page):
         print_err(namespace.verbose, 'no parent directory line')
@@ -212,7 +212,7 @@ def parse_url(namespace, depth, url, conf=None, count=1):
             if namespace.max_depth is not None and (depth + 1 > namespace.max_depth):
                 print_err(namespace.verbose, ':: max depth reached; ignore ' + to_url)
             elif 'http://' not in line:
-                count = parse_url(namespace, depth+1, to_url, conf, count)
+                count = parse_url(depth+1, to_url, conf, count)
             continue
         search = conf.a_regexp().search(line)
         date = conf.date_regexp().search(line)
@@ -226,14 +226,14 @@ def parse_url(namespace, depth, url, conf=None, count=1):
             line = line.replace(date, '')
             size = line.strip()
             if check_entry(date, size, href, conf, depth):
-                if is_between_lines(namespace, count):
+                if is_between_lines(count):
                     date = datetime.datetime.strptime(date, conf.date_strptime())
                     date = date.strftime('%Y-%m-%d %H:%M')
                     size = humanize_size(size)
                     execute(date, size, href, count)
                 else:
                     print_err(namespace.verbose, ":: not in range (#" + str(count) + "); ignore " + to_url)
-                count += 1
+            count += 1
     return count
 
 
@@ -285,7 +285,7 @@ def check_entry(date, size, href, conf, depth):
             print_err(namespace.verbose, ':: extension/pattern not accepted; ignore ' + href) 
             return 0
     if namespace.reject is not None:
-        ok = url_matches(href, namespace.accept)
+        ok = url_matches(href, namespace.reject)
         if ok:
             print_err(namespace.verbose, ':: extension/pattern not accepted; ignore ' + href) 
             return 0
@@ -327,8 +327,8 @@ def get_datetime(text):
         return datetime.datetime.strptime(text, '%Y-%m-%d %H:%M')
 
 
-def is_between_lines(namespace, c):
-    if namespace.lines != None:
+def is_between_lines(c):
+    if namespace.lines is not None:
         o = re.match("(\d+)?(-)?(\d+)?", namespace.lines)
         if o.group(2) == '-':
             (start, end) = (o.group(1), o.group(3))
@@ -341,7 +341,7 @@ def is_between_lines(namespace, c):
     return True
 
 
-def parse_file(namespace, file, count=1):
+def parse_file(file, count=1):
     print_err(namespace.verbose, ':: read ' + file)
     with open(file, 'r') as fd:
         content = fd.read()
@@ -351,11 +351,11 @@ def parse_file(namespace, file, count=1):
             line = line[:-1]
             (date, size, href) = line.split('|', 3)
             if check_entry(date, size, href, conf):
-                if is_between_lines(namespace, count):
+                if is_between_lines(count):
                     execute(date, size, href, count)
                 else:
                     print_err(namespace.verbose, ":: not in range (#" + str(count) + "); ignore " + href)
-                count += 1
+            count += 1
 
 
 def check_date_detection(expected, line):
@@ -418,12 +418,9 @@ if len(sys.argv) == 1:
 namespace = parser.parse_args()
 try:
     if namespace.command == 'url':
-        url = namespace.url[0]
-        if url and not url.endswith('/'):
-            url = url + '/' 
-        parse_url(namespace, 0, url)
+        parse_url(0, namespace.url[0] + '/' if not namespace.url[0].endswith('/') else '')
     else:
-        parse_file(namespace, namespace.file[0])
+        parse_file(namespace.file[0])
 except KeyboardInterrupt:
     print('Interrupted.', file=sys.stderr)
 
