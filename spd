@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import http.cookiejar
 import os
 import os.path
 import re
@@ -15,7 +14,7 @@ import datetime
 import yaml
 import fnmatch
 from signal import signal, SIGPIPE, SIG_DFL
-signal(SIGPIPE,SIG_DFL) 
+signal(SIGPIPE, SIG_DFL)
 
 
 # RAF 
@@ -23,7 +22,7 @@ signal(SIGPIPE,SIG_DFL)
 
 def readconf(configfile):
     global yamldoc
-    confpath=os.path.expanduser(configfile)
+    confpath = os.path.expanduser(configfile)
     if not os.path.exists(confpath):
         with open(confpath, 'w', encoding='utf-8') as fd:
             print('Create a default configuration file.', file=sys.stderr)
@@ -64,6 +63,7 @@ a2strptime:
     with open(confpath, 'r', encoding='utf-8') as stream:
         yamldoc = yaml.load(stream)
 
+
 def print_err(verbose, text):
     if not verbose:
         print(text, file=sys.stderr)
@@ -84,24 +84,26 @@ def read_url(verbose, urlopener, url, encoding='latin1'):
 
 
 def size_str_2_int(s):
-    if s[-1]=='k':
+    if s[-1] == 'k':
         return int(float(s[:-1])*1024)
-    elif s[-1]=='M':
+    elif s[-1] == 'M':
         return int(float(s[:-1])*1024*1024)
     else:
         return int(s)
 
+
 def humanize_size(s):
     if re.match('^\d+$', s):
-        (s, x)=(int(s),'')
-        if s>=1024:
-            s=s//1024
-            x='k'
-        if s>=1024:
-            s=s//1024
-            x='M'
+        (s, x) = (int(s), '')
+        if s >= 1024:
+            s //= 1024
+            x = 'k'
+        if s >= 1024:
+            s //= 1024
+            x = 'M'
         return '%d%s' % (s, x)
     return s
+
 
 class Conf:
     
@@ -128,39 +130,40 @@ class Conf:
             return None
 
 
-def range_padded(s,n,l=2):
-    return '(' + '|'.join([str(x).zfill(l) for x in range(s,n+1)]) + ')'
+def range_padded(s, n, l=2):
+    return '(' + '|'.join([str(x).zfill(l) for x in range(s, n+1)]) + ')'
+
 
 def a2regexp(f):
-    f = f.replace('DD', range_padded(1,31)) 
-    f = f.replace('D', range_padded(1,31,1))
+    f = f.replace('DD', range_padded(1, 31))
+    f = f.replace('D', range_padded(1, 31, 1))
     f = f.replace('dddd', '\w+')
     f = f.replace('ddd', '\w+')
-    f = f.replace('d', range_padded(1,7,1))
+    f = f.replace('d', range_padded(1, 7, 1))
     f = f.replace('MMMM', '\w+')
     f = f.replace('MMM', '\w+')
-    f = f.replace('MM', range_padded(1,12))
-    f = f.replace('M', range_padded(1,12,1))
+    f = f.replace('MM', range_padded(1, 12))
+    f = f.replace('M', range_padded(1, 12, 1))
     f = f.replace('YYYY', '([12][0-9]{3})')
-    f = f.replace('HH', range_padded(0,23))
-    f = f.replace('H', range_padded(0,23,1))
-    f = f.replace('hh', range_padded(1,12))
-    f = f.replace('h', range_padded(1,12,1))
+    f = f.replace('HH', range_padded(0, 23))
+    f = f.replace('H', range_padded(0, 23, 1))
+    f = f.replace('hh', range_padded(1, 12))
+    f = f.replace('h', range_padded(1, 12, 1))
     f = f.replace('A', '(AM|PM)')
     f = f.replace('a', '(am|pm)')
-    f = f.replace('mm', range_padded(0,59))
-    f = f.replace('m', range_padded(0,59,1))
+    f = f.replace('mm', range_padded(0, 59))
+    f = f.replace('m', range_padded(0, 59, 1))
     f = f.replace(' ', '\s+')
     f = f.replace(',', '\s*,\s*')
-    
-    #return '.*(' + f + ').*'
     return f
 
+
 def a2strptime(f):
-    keys = [ (len(x), x) for x in A2STRPTIME ]
+    keys = [(len(x), x) for x in A2STRPTIME]
     keys.sort()
     keys.reverse()
-    return re.sub('|'.join([b for a,b in keys]), lambda matchobj: A2STRPTIME[matchobj.group(0)], f)
+    return re.sub('|'.join([b for a, b in keys]), lambda matched_obj: A2STRPTIME[matched_obj.group(0)], f)
+
 
 def detect_conf(page):
     page = page.replace('\n', '')
@@ -169,11 +172,8 @@ def detect_conf(page):
         print('Date format not detected.', file=sys.stderr)
         sys.exit(1)
     line_sep = '<br>' if re.match('.*</a><br>.*', page, re.IGNORECASE) else '\n'
-    #print(date_fmt, a2regexp(date_fmt))
-    return Conf(DIR_REGEX, 
-                A_REGEX, 
-                date_fmt, 
-                line_sep)
+    return Conf(DIR_REGEX, A_REGEX, date_fmt, line_sep)
+
 
 def fix_url(url, current_url=None):
     if current_url:
@@ -187,11 +187,13 @@ def fix_url(url, current_url=None):
         parsed_aslist = list(parsed)
         parsed_aslist[4] = urllib.parse.urlencode(qs)
         return urllib.parse.urlunparse(parsed_aslist)
-    except:
+    except Exception:
         return url
+
 
 PARENT_DIRECTORY = re.compile('Parent Directory|<a href="\\.\\./">\\.\\./</a>', re.I)
 LAST_MODIFIED = re.compile('Last modified', re.I)
+
 
 def parse_url(namespace, depth, url, conf=None, count=1):
     page = read_url(namespace.verbose, None, url)
@@ -206,33 +208,34 @@ def parse_url(namespace, depth, url, conf=None, count=1):
         search = conf.dir_regexp().search(line)
         if search:
             line = search.group(1)
-            tourl = fix_url(line, url)
+            to_url = fix_url(line, url)
             if namespace.max_depth is not None and (depth + 1 > namespace.max_depth):
-                print_err(namespace.verbose, ':: max depth reached; ignore ' + tourl) 
+                print_err(namespace.verbose, ':: max depth reached; ignore ' + to_url)
             elif 'http://' not in line:
-                count = parse_url(namespace, depth+1, tourl, conf, count)
+                count = parse_url(namespace, depth+1, to_url, conf, count)
             continue
         search = conf.a_regexp().search(line)
         date = conf.date_regexp().search(line)
         if date:
             date = date.group(0)
         if search and date:
-            tourl = search.group(1)
-            href = fix_url(tourl, url)
+            to_url = search.group(1)
+            href = fix_url(to_url, url)
             for regex in CLEAN_LINE:
                 line = regex.sub('', line)
             line = line.replace(date, '')
             size = line.strip()
-            if check_entry(date, size, href, conf):
+            if check_entry(date, size, href, conf, depth):
                 if is_between_lines(namespace, count):
                     date = datetime.datetime.strptime(date, conf.date_strptime())
                     date = date.strftime('%Y-%m-%d %H:%M')
                     size = humanize_size(size)
                     execute(date, size, href, count)
                 else:
-                    print_err(namespace.verbose, ":: not in range (#" + str(count) + "); ignore " + tourl)
-                count = count + 1
+                    print_err(namespace.verbose, ":: not in range (#" + str(count) + "); ignore " + to_url)
+                count += 1
     return count
+
 
 def print_separator(text):
     columns = shutil.get_terminal_size().columns
@@ -240,6 +243,7 @@ def print_separator(text):
     print('// ' + text + ' ' + '/' * (columns - len(text) - 5), file=sys.stderr)
     print('/' * columns, file=sys.stderr)
     print('', file=sys.stderr)
+
 
 def execute(date, size, href, count):
     if any([namespace.print, namespace.exec, namespace.banner]):
@@ -250,19 +254,21 @@ def execute(date, size, href, count):
         if namespace.exec:
             import shlex
             import subprocess
-            l = [ x.format(index=count, size=size, date=date, url=href) for x in shlex.split(namespace.exec) ]
+            l = [x.format(index=count, size=size, date=date, url=href) for x in shlex.split(namespace.exec)]
             subprocess.call(l)
     else:
         print(date + '|' + size + '|' + href)
+
 
 def size_string(v):
     try:
         return re.match("^\d+(\.\d+)?[kM]?", v).group(0)
     except:
-        raise ArgumentTypeError("String '%s' does not match required format" % (v,))
+        raise argparse.ArgumentTypeError("String '%s' does not match required format" % (v,))
 
-def url_matches(href, str):
-    for x in str.split(','):
+
+def url_matches(href, element):
+    for x in element.split(','):
         if any(y in x for y in ('*', '?', '[', ']')):
             r = fnmatch.fnmatch(href, x)
         else:
@@ -271,7 +277,8 @@ def url_matches(href, str):
             return True
     return False
 
-def check_entry(date, size, href, conf):
+
+def check_entry(date, size, href, conf, depth):
     if namespace.accept is not None:
         ok = url_matches(href, namespace.accept)
         if not ok:
@@ -283,35 +290,36 @@ def check_entry(date, size, href, conf):
             print_err(namespace.verbose, ':: extension/pattern not accepted; ignore ' + href) 
             return 0
     if namespace.min_size is not None:
-        bsize = size_str_2_int(size)
-        msize = size_str_2_int(namespace.min_size)
-        if bsize < msize:
+        entry_size = size_str_2_int(size)
+        min_size_expected = size_str_2_int(namespace.min_size)
+        if entry_size < min_size_expected:
             print_err(namespace.verbose, ':: file too small [%s]; ignore %s' % (size, href)) 
             return 0
     if namespace.max_size is not None:
-        bsize = size_str_2_int(size)
-        msize = size_str_2_int(namespace.max_size)
-        if bsize > msize:
+        entry_size = size_str_2_int(size)
+        max_size_expected = size_str_2_int(namespace.max_size)
+        if entry_size > max_size_expected:
             print_err(namespace.verbose, ':: file too large [%s]; ignore %s' % (size, href)) 
             return 0
     if namespace.min_depth is not None and depth < namespace.min_depth:
         print_err(namespace.verbose, ':: min depth not reached; ignore ' + href) 
         return 0
     if namespace.before is not None:
-        bdate = datetime.datetime.strptime(date, conf.date_strptime())
-        mdate = getdatetime(namespace.before)
-        if bdate > mdate:
-            print_err(namespace.verbose, ':: date [%s] after [%s]; ignore %s' % (bdate, mdate, href)) 
+        entry_date = datetime.datetime.strptime(date, conf.date_strptime())
+        max_date_expected = get_datetime(namespace.before)
+        if entry_date > max_date_expected:
+            print_err(namespace.verbose, ':: date [%s] after [%s]; ignore %s' % (entry_date, max_date_expected, href))
             return 0
     if namespace.after is not None:
-        bdate = datetime.datetime.strptime(date, conf.date_strptime())
-        mdate = getdatetime(namespace.after)
-        if bdate < mdate:
-            print_err(namespace.verbose, ':: date [%s] before [%s]; ignore %s' % (bdate, mdate, href)) 
+        entry_date = datetime.datetime.strptime(date, conf.date_strptime())
+        min_date_expected = get_datetime(namespace.after)
+        if entry_date < min_date_expected:
+            print_err(namespace.verbose, ':: date [%s] before [%s]; ignore %s' % (entry_date, min_date_expected, href))
             return 0
     return 1
 
-def getdatetime(text):
+
+def get_datetime(text):
     o = re.match("(\d+) day(s)? ago", text)
     if o:
         return datetime.datetime.now() - datetime.timedelta(int(o.group(1)))
@@ -332,6 +340,7 @@ def is_between_lines(namespace, c):
             return False
     return True
 
+
 def parse_file(namespace, file, count=1):
     print_err(namespace.verbose, ':: read ' + file)
     with open(file, 'r') as fd:
@@ -346,13 +355,14 @@ def parse_file(namespace, file, count=1):
                     execute(date, size, href, count)
                 else:
                     print_err(namespace.verbose, ":: not in range (#" + str(count) + "); ignore " + href)
-                count = count + 1
+                count += 1
+
 
 def check_date_detection(expected, line):
     conf = detect_conf(line)
-    assert conf != None
+    assert conf is not None
     date = conf.date_regexp().search(line)
-    assert date != None
+    assert date is not None
     assert date.group(0) == expected
     
 
@@ -366,7 +376,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                  add_help=True,
                                  description='Scan Public Directory tool')
 
-subparsers = parser.add_subparsers(help='Help for subcommand', dest='command')
+subparsers = parser.add_subparsers(help='Help for sub-command', dest='command')
 
 parser_url = subparsers.add_parser('url', help='Scan an url and follow links to create a file containing urls')
 parser_url.add_argument('url', metavar='URL', type=str, nargs=1, help='The url where performing operation')
@@ -389,18 +399,20 @@ for a_parser in [ parser_url, parser_file ]:
     a_parser.add_argument('--print', metavar='FORMAT', type=str, help='Print the given string replacing patterns {index} {date} {size} {url} by their respective values")')
     a_parser.add_argument('--exec', metavar='COMMAND', type=str, help='Execute the given shell command (ex: echo "#{index} {date} // {size} // {url}")')
 
+
 readconf('~/.spdrc')
 
-CLEAN_LINE = [ re.compile(x, re.IGNORECASE) for x in yamldoc["clean_line"] ]
+
+CLEAN_LINE = [re.compile(x, re.IGNORECASE) for x in yamldoc["clean_line"]]
 FORMATS = yamldoc['formats']
 A2STRPTIME = yamldoc['a2strptime']
 DIR_REGEX = yamldoc['dir_regex']
 A_REGEX = yamldoc['a_regex']
 
-if len(sys.argv)==1: 
+
+if len(sys.argv) == 1:
     parser.print_help()
     sys.exit(1)
-
 
 
 namespace = parser.parse_args()
