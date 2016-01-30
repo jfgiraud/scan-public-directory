@@ -21,10 +21,9 @@ signal(SIGPIPE, SIG_DFL)
 # fmt
 
 def readconf(configfile):
-    global yamldoc
-    confpath = os.path.expanduser(configfile)
-    if not os.path.exists(confpath):
-        with open(confpath, 'w', encoding='utf-8') as fd:
+    path = os.path.expanduser(configfile)
+    if not os.path.exists(path):
+        with open(path, 'w', encoding='utf-8') as fd:
             print('Create a default configuration file.', file=sys.stderr)
             fd.write('''dir_regex: '<a href="([^"]*/)">[^<]*</a>'
 a_regex: '<a href="([^"]*[^\/])">[^<]*</a>'
@@ -59,9 +58,11 @@ a2strptime:
   'a': '%p'
   'mm': '%M'
   'm': '%M'
+aliases:
+  :wget: "wget -c '{url}'"
 ''')
-    with open(confpath, 'r', encoding='utf-8') as stream:
-        yamldoc = yaml.load(stream)
+    with open(path, 'r', encoding='utf-8') as stream:
+        return yaml.load(stream)
 
 
 def print_err(verbose, text):
@@ -252,9 +253,12 @@ def execute(date, size, href, count):
         if namespace.print:
             print(namespace.print.format(index=count, size=size, date=date, url=href, file=sys.stdout))
         if namespace.exec:
+            command = namespace.exec
+            if command[0] == ':':
+                command = yamldoc['aliases'][command]
             import shlex
             import subprocess
-            l = [x.format(index=count, size=size, date=date, url=href) for x in shlex.split(namespace.exec)]
+            l = [x.format(index=count, size=size, date=date, url=href) for x in shlex.split(command)]
             subprocess.call(l)
     else:
         print(date + '|' + size + '|' + href)
@@ -347,15 +351,15 @@ def parse_file(file, count=1):
         content = fd.read()
     conf = detect_conf(content)
     with open(file, 'r') as fd:
-        for line in fd:
+        for number, line in enumerate(fd):
             line = line[:-1]
             (date, size, href) = line.split('|', 3)
-            if check_entry(date, size, href, conf):
-                if is_between_lines(count):
+            if check_entry(date, size, href, conf, 0):
+                if is_between_lines(number):
                     execute(date, size, href, count)
+                    count += 1
                 else:
                     print_err(namespace.verbose, ":: not in range (#" + str(count) + "); ignore " + href)
-            count += 1
 
 
 def check_date_detection(expected, line):
@@ -384,7 +388,7 @@ parser_url.add_argument('url', metavar='URL', type=str, nargs=1, help='The url w
 parser_file = subparsers.add_parser('file', help='Scan a file containing urls to filter items')
 parser_file.add_argument('file', metavar='FILE', type=str, nargs=1, help='The file on which perform operation')
 
-for a_parser in [ parser_url, parser_file ]:
+for a_parser in [parser_url, parser_file]:
     a_parser.add_argument('--max-depth', metavar='LEVELS', type=int, help='Descend at mots levels')
     a_parser.add_argument('--min-depth', metavar='LEVELS', type=int, help='Ignore file links at levels less than levels')
     a_parser.add_argument('--min-size', metavar='SIZE', type=size_string, help='Ignore file with size less than the specified size')
@@ -397,11 +401,10 @@ for a_parser in [ parser_url, parser_file ]:
     a_parser.add_argument('--lines', metavar='LINES', type=str, help='Select specified lines matching all filters (N, N-, N-M, -M)')
     a_parser.add_argument('--banner', help='Display banner ', action='store_true')
     a_parser.add_argument('--print', metavar='FORMAT', type=str, help='Print the given string replacing patterns {index} {date} {size} {url} by their respective values")')
-    a_parser.add_argument('--exec', metavar='COMMAND', type=str, help='Execute the given shell command (ex: echo "#{index} {date} // {size} // {url}")')
+    a_parser.add_argument('--exec', metavar='COMMAND', type=str, help='Execute the given shell command (ex: echo "#{index} {date} // {size} // {url}"). If command starts with : it is considered as an alias')
 
 
-readconf('~/.spdrc')
-
+yamldoc = readconf('~/.spdrc')
 
 CLEAN_LINE = [re.compile(x, re.IGNORECASE) for x in yamldoc["clean_line"]]
 FORMATS = yamldoc['formats']
