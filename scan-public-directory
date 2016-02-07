@@ -421,7 +421,7 @@ if len(sys.argv) == 1:
 namespace = parser.parse_args()
 try:
     if namespace.command == 'url':
-        parse_url(0, namespace.url[0] + '/' if not namespace.url[0].endswith('/') else '')
+        parse_url(0, namespace.url[0] + ('/' if not namespace.url[0].endswith('/') else ''))
     else:
         parse_file(namespace.file[0])
 except KeyboardInterrupt:
