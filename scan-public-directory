@@ -37,6 +37,7 @@ clean_line:
   - "&nbsp;"
 formats:
   - "DD-MMM-YYYY HH:mm"
+  - "YYYY-MMM-DD HH:mm"
   - "M/D/YYYY h:mm A"
   - "YYYY-MM-DD HH:mm"
   - "dddd, MMMM DD, YYYY h:mm A"
@@ -81,6 +82,7 @@ def read_url(verbose, urlopener, url, encoding='latin1'):
         content = response.read()
         return content.decode(encoding)
     except Exception as e:
+        print(e, file=sys.stderr)
         raise Exception('Error while trying to read url %s' % url)
 
 
@@ -136,27 +138,32 @@ def range_padded(s, n, l=2):
 
 
 def a2regexp(f):
-    f = f.replace('DD', range_padded(1, 31))
-    f = f.replace('D', range_padded(1, 31, 1))
-    f = f.replace('dddd', '\w+')
-    f = f.replace('ddd', '\w+')
-    f = f.replace('d', range_padded(1, 7, 1))
-    f = f.replace('MMMM', '\w+')
-    f = f.replace('MMM', '\w+')
-    f = f.replace('MM', range_padded(1, 12))
-    f = f.replace('M', range_padded(1, 12, 1))
-    f = f.replace('YYYY', '([12][0-9]{3})')
-    f = f.replace('HH', range_padded(0, 23))
-    f = f.replace('H', range_padded(0, 23, 1))
-    f = f.replace('hh', range_padded(1, 12))
-    f = f.replace('h', range_padded(1, 12, 1))
-    f = f.replace('A', '(AM|PM)')
-    f = f.replace('a', '(am|pm)')
-    f = f.replace('mm', range_padded(0, 59))
-    f = f.replace('m', range_padded(0, 59, 1))
-    f = f.replace(' ', '\s+')
-    f = f.replace(',', '\s*,\s*')
-    return f
+    m = {
+        'DD': range_padded(1, 31),
+        'D': range_padded(1, 31, 1),
+        'dddd': '([a-zA-Z])+',
+        'ddd': '([a-zA-Z])+',
+        'd': range_padded(1, 7, 1),
+        'MMMM': '([a-zA-Z])+',
+        'MMM': '([a-zA-Z])+',
+        'MM': range_padded(1, 12),
+        'M': range_padded(1, 12, 1),
+        'YYYY': '([12][0-9]{3})',
+        'HH': range_padded(0, 23),
+        'H': range_padded(0, 23, 1),
+        'hh': range_padded(1, 12),
+        'h': range_padded(1, 12, 1),
+        'A': '(AM|PM)',
+        'a': '(am|pm)',
+        'mm': range_padded(0, 59),
+        'm': range_padded(0, 59, 1),
+        ' ': '\s+',
+        ',': '\s*,\s*'
+    }
+    pattern = '|'.join(sorted(m, reverse=True))
+    repl = lambda matchobj: m[matchobj.group(0)]
+    line = re.sub(pattern, repl, f)
+    return line
 
 
 def a2strptime(f):
@@ -169,6 +176,8 @@ def a2strptime(f):
 def detect_conf(page):
     page = page.replace('\n', '')
     date_fmt = next((fmt for fmt in FORMATS if re.search(a2regexp(fmt), page, re.IGNORECASE)), None)
+    print(date_fmt)
+    print('--')
     if date_fmt is None:
         print('Date format not detected.', file=sys.stderr)
         sys.exit(1)
