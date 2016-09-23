@@ -3,7 +3,7 @@
 prefix=$1
 shift
 
-if [ -e "$prefix" ]; then
+if [ -z "$prefix" ]; then
     echo "Usage: renumber prefix file1 ... fileN"
     exit 1
 fi
