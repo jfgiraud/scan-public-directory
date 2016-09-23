@@ -6,14 +6,17 @@ It permits to specify filters to accept or reject links.
 
 
 ```
-+------------------------------------------------+--------+
-| +"parent directory" +size photos               | SEARCH |
-+------------------------------------------------+--------+
-```
+::: Source :::
+Index of /images
 
-![https://bytebucket.org/jfgiraud/scan-public-directory/raw/7dcfba884a678a5f7016317fbc40a454619d87cb/doc/source.jpg?token=d0bcf28ef18af2a90663038667af0eaf5a530316](xx)
+Icon  Name                    Last modified      Size  Description[DIR] Parent Directory                             -   
+[IMG] 02-09.jpg               01-Feb-2009 11:13  2.4K  
+[IMG] 021110.jpg              03-Nov-2010 10:36  3.4K  
+[IMG] 03-07.jpg               01-Mar-2007 08:21  4.1K  
+[IMG] 03-08.jpg               01-Mar-2008 08:51  2.5K  
+[IMG] 04-06.jpg               03-Apr-2006 12:13  6.2K  
+[IMG] 04-08.jpg               31-Mar-2008 20:14  7.1K  
 
-```
 ::: Target :::
 $ ./scan-public-directory url http://example.net/images/ | head
 2009-02-01 11:13|2.4K|http://example.net/images/02-09.jpg
