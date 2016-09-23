@@ -407,7 +407,7 @@ for a_parser in [parser_url, parser_file]:
     a_parser.add_argument('--before', metavar='DATETIME', type=str, help='Reject the files with date/time after the specified datetime (YYYY-MM-DD hh:mm)')
     a_parser.add_argument('--lines', metavar='LINES', type=str, help='Select specified lines matching all filters (N, N-, N-M, -M)')
     a_parser.add_argument('--banner', help='Display banner ', action='store_true')
-    a_parser.add_argument('--print', metavar='FORMAT', type=str, help='Print the given string replacing patterns {index} {date} {size} {url} by their respective values")')
+    a_parser.add_argument('--print', metavar='FORMAT', type=str, help='Print the given string replacing patterns {index} {date} {size} {url} by their respective values')
     a_parser.add_argument('--exec', metavar='COMMAND', type=str, help='Execute the given shell command (ex: echo "#{index} {date} // {size} // {url}"). If command starts with : it is considered as an alias')
 
 

@@ -122,7 +122,7 @@ optional arguments:
                       -M)
   --banner            Display banner
   --print FORMAT      Print the given string replacing patterns {index} {date}
-                      {size} {url} by their respective values")
+                      {size} {url} by their respective values
   --exec COMMAND      Execute the given shell command (ex: echo "#{index}
                       {date} // {size} // {url}"). If command starts with : it
                       is considered as an alias
