@@ -11,7 +11,7 @@ It permits to specify filters to accept or reject links.
 +------------------------------------------------+--------+
 ```
 
-![]
+![https://bytebucket.org/jfgiraud/scan-public-directory/raw/7dcfba884a678a5f7016317fbc40a454619d87cb/doc/source.jpg?token=d0bcf28ef18af2a90663038667af0eaf5a530316](xx)
 
 ```
 ::: Target :::
