@@ -1,0 +1,118 @@
+#!/usr/bin/python3 -u
+# #-*- coding:utf-8 -*-
+import argparse
+import sys
+import codecs
+from datetime import datetime, timedelta
+
+class subtitle:
+
+    def __init__(self, idsub, start, end, txt):
+        self.idsub = idsub
+        self.start = datetime.strptime(start, "%H:%M:%S,%f")
+        self.end = datetime.strptime(end, "%H:%M:%S,%f")
+        self.txt = txt
+
+    def __repr__(self):
+        return "%s %s %s %s" % (self.idsub, self.start.time(), self.end.time(),
+                                self.txt)
+
+    def shift(self, delta):
+        self.start += delta
+        self.end += delta
+
+def parse(path):
+    with codecs.open(path, 'r', 'utf-8-sig') as f:
+        subtitles = []
+        state = 1
+        for line in f:
+            line = line[:-2]
+            if line == u'':
+                state = 5
+            if state == 1:
+                txt = []
+                idsub = int(line)
+            elif state == 2:
+                start, end = line.split(u'-->')
+            elif state == 5:
+                subtitles.append(subtitle(idsub, start[:-1], end[1:], txt))
+                state = 0
+            else:
+                txt.append(line)
+            state += 1
+        return subtitles
+
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                add_help=True,
+                                description='Subtitle Time Modifier tool')
+parser.add_argument("--file", metavar="FILE", type=str, help="The input file containing subtitles")
+parser.add_argument("--dialog", metavar="NUMBER", type=int, help="The dialog number in subtitle file")
+parser.add_argument("--time", metavar="TIME", type=str, help="The time in the video file when the dialog is heard")
+
+
+if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
+
+namespace = parser.parse_args()
+try:
+    subtitles = parse(namespace.file)
+    for s in subtitles:
+        print(s)
+except KeyboardInterrupt:
+    print('Interrupted.', file=sys.stderr)
+
+sys.exit()
+
+
+from datetime import datetime, timedelta
+import sys
+import codecs
+
+
+
+
+from pprint import pprint
+
+
+
+def shift_time(subtitles, delta):
+    for s in subtitles:
+        s.shift(delta)
+
+fn = sys.argv[1]
+startid = int(sys.argv[2])
+delta = int(sys.argv[3])
+
+second = delta / 10
+subsec = delta % 10
+
+delta = timedelta(0, second, subsec * 100000)
+
+print(fn, startid, delta)
+
+fno = fn + '.srt'
+
+
+
+shift_time(subtitles, delta)
+
+
+f = codecs.open(fno, 'w', 'utf-8-sig')
+
+for s in subtitles:
+    if startid == s.idsub:
+        print(s.start.time())
+    f.write(u'%s' % s.idsub)
+    f.write('\r\n')
+    f.write(s.start.time().strftime('%H:%M:%S,%f')[:-3])
+    f.write(' --> ')
+    f.write(s.end.time().strftime('%H:%M:%S,%f')[:-3])
+    f.write('\r\n')
+    for t in s.txt:
+        f.write(t)
+        f.write('\r\n')
+    f.write('\r\n')
+
+f.close()
