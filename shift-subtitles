@@ -14,8 +14,9 @@ class subtitle:
         self.txt = txt
 
     def __repr__(self):
-        return "%s %s %s %s" % (self.idsub, self.start.time(), self.end.time(),
-                                self.txt)
+        return "%s\n" % self.idsub \
+            + "%s --> %s\n" % (self.start.time().strftime("%H:%M:%S,%f")[:-3], self.end.time().strftime("%H:%M:%S,%f")[:-3]) \
+            + '\n'.join(self.txt)
 
     def shift(self, delta):
         self.start += delta
@@ -28,18 +29,19 @@ def parse(path):
         for line in f:
             line = line[:-2]
             if line == u'':
-                state = 5
+                subtitles.append(subtitle(idsub, start[:-1], end[1:], txt))
+                state = 0
             if state == 1:
                 txt = []
                 idsub = int(line)
             elif state == 2:
                 start, end = line.split(u'-->')
-            elif state == 5:
-                subtitles.append(subtitle(idsub, start[:-1], end[1:], txt))
-                state = 0
             else:
                 txt.append(line)
             state += 1
+        else:
+            if state != 0:
+                subtitles.append(subtitle(idsub, start[:-1], end[1:], txt))
         return subtitles
 
 
@@ -55,64 +57,21 @@ if len(sys.argv) == 1:
     parser.print_help()
     sys.exit(1)
 
+
+
 namespace = parser.parse_args()
 try:
+    new_datetime = datetime.strptime(namespace.time, '%H:%M:%S,%f')
+except:
+    new_datetime = datetime.strptime(namespace.time, '%H:%M:%S')
+try:
     subtitles = parse(namespace.file)
+    old_datetime = subtitles[namespace.dialog-1].start
+    delta = new_datetime - old_datetime
     for s in subtitles:
+        s.shift(delta)
         print(s)
 except KeyboardInterrupt:
     print('Interrupted.', file=sys.stderr)
 
-sys.exit()
 
-
-from datetime import datetime, timedelta
-import sys
-import codecs
-
-
-
-
-from pprint import pprint
-
-
-
-def shift_time(subtitles, delta):
-    for s in subtitles:
-        s.shift(delta)
-
-fn = sys.argv[1]
-startid = int(sys.argv[2])
-delta = int(sys.argv[3])
-
-second = delta / 10
-subsec = delta % 10
-
-delta = timedelta(0, second, subsec * 100000)
-
-print(fn, startid, delta)
-
-fno = fn + '.srt'
-
-
-
-shift_time(subtitles, delta)
-
-
-f = codecs.open(fno, 'w', 'utf-8-sig')
-
-for s in subtitles:
-    if startid == s.idsub:
-        print(s.start.time())
-    f.write(u'%s' % s.idsub)
-    f.write('\r\n')
-    f.write(s.start.time().strftime('%H:%M:%S,%f')[:-3])
-    f.write(' --> ')
-    f.write(s.end.time().strftime('%H:%M:%S,%f')[:-3])
-    f.write('\r\n')
-    for t in s.txt:
-        f.write(t)
-        f.write('\r\n')
-    f.write('\r\n')
-
-f.close()
