@@ -1,7 +1,7 @@
 # scan-public-directory 
 
 
-`scan-public-directory` is a tool to generate links data from a specified public directory returned by a web server.
+`scan-public-directory` is a tool to extract links from a specified public directory returned by a web server.
 It permits to specify filters to accept or reject links.
 
 ## page source
