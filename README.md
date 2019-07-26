@@ -2,7 +2,10 @@
 
 
 `scan-public-directory` is a tool to extract links from a specified public directory returned by a web server.
-It permits to specify filters to accept or reject links.
+
+It permits :
+- to specify filters to accept or reject links
+- to define and call a command on each selected link
 
 ## page source
 
