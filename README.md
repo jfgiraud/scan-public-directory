@@ -4,9 +4,9 @@
 `scan-public-directory` is a tool to generate links data from a specified public directory returned by a web server.
 It permits to specify filters to accept or reject links.
 
+## PAGE
 
 ```
-::: Source :::
 Index of /images
 
 Icon  Name                    Last modified      Size  Description[DIR] Parent Directory                             -   
@@ -16,8 +16,10 @@ Icon  Name                    Last modified      Size  Description[DIR] Parent D
 [IMG] 03-08.jpg               01-Mar-2008 08:51  2.5K  
 [IMG] 04-06.jpg               03-Apr-2006 12:13  6.2K  
 [IMG] 04-08.jpg               31-Mar-2008 20:14  7.1K  
+```
 
-::: Target :::
+## COMMAND
+```
 $ ./scan-public-directory url http://example.net/images/ | head
 2009-02-01 11:13|2.4K|http://example.net/images/02-09.jpg
 2010-11-03 10:36|3.4K|http://example.net/images/021110.jpg
