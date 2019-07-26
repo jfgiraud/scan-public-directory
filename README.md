@@ -5,7 +5,7 @@
 
 It permits :
 - to specify filters to accept or reject links
-- to define and call a command on each selected link
+- to define and call a command on each selected link (like wget)
 
 ## page source
 
