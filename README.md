@@ -1,4 +1,3 @@
-
 # scan-public-directory 
 
 `scan-public-directory` is a tool to extract links from a specified public directory returned by a web server.
@@ -9,7 +8,7 @@ It permits :
 
 ## page source
 
-[logo](./capture.jpg?raw=true)
+![capture](capture.jpg?raw=true)
 
 ## command result
 
