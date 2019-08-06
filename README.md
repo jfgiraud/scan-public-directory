@@ -21,52 +21,12 @@ $ ./scan-public-directory url http://example.com/images/
 
 ## configuration file
 
-A configuration file is created on the first program execution.
-
-```bash
-$ cat ~/.spdrc 
-dir_regex: '<a href="([^"]*/)">[^<]*</a>'
-a_regex: '<a href="([^"]*[^\/])">[^<]*</a>'
-clean_line:
-  - "\\s*<img[^>]+>\\s*"
-  - "\\s*<a[^>]+>[^<]*</a>\\s*"
-  - "\\s*<td[^>]*>\\s*"
-  - "\\s*<tr[^>]*>\\s*"
-  - "\\s*</td>\\s*"
-  - "\\s*</tr>\\s*"
-  - "&nbsp;"
-formats:
-  - "DD-MMM-YYYY HH:mm"
-  - "YYYY-MMM-DD HH:mm"
-  - "M/D/YYYY h:mm A"
-  - "YYYY-MM-DD HH:mm"
-  - "dddd, MMMM DD, YYYY h:mm A"
-a2strptime:
-  'dddd': '%A'
-  'ddd': '%a'
-  'DD': '%d'
-  'D': '%d'
-  'MMMM': '%B'
-  'MMM': '%b'
-  'MM': '%m'
-  'M': '%m'
-  'YYYY': '%Y'
-  'HH': '%H'
-  'H': '%H'
-  'hh': '%I'
-  'h': '%I'
-  'A': '%p'
-  'a': '%p'
-  'mm': '%M'
-  'm': '%M'
-aliases:
-  :wget: "wget -c '{url}'"
-```
+A configuration file `.spdrc` is created on the first program execution.
 
 The configuration file defines the regexp to search after cleaning lines.
-                    
-Links are extracted with their size & date.
-    
+
+You can define new formats to detect and extract links.
+
 ## usage 
            
 The program takes `url` or `file` as the first parameter.                    
@@ -115,7 +75,7 @@ optional arguments:
                       is considered as an alias
 ```
 
-## examples
+## examples of use
 
 ```bash
 $ ./scan-public-directory url http://example.com/images/ | tee photo.txt
@@ -132,3 +92,44 @@ $ ./scan-public-directory file photo.txt --accept '*-0*' --before '2015-12-25 19
 If necessary, after filtering, you can call a shell command (see the `--exec` option in the usage)
 
 
+## Configuration file sample
+
+```bash
+$ cat ~/.spdrc 
+dir_regex: '<a href="([^"]*/)">[^<]*</a>'
+a_regex: '<a href="([^"]*[^\/])">[^<]*</a>'
+clean_line:
+  - "\\s*<img[^>]+>\\s*"
+  - "\\s*<a[^>]+>[^<]*</a>\\s*"
+  - "\\s*<td[^>]*>\\s*"
+  - "\\s*<tr[^>]*>\\s*"
+  - "\\s*</td>\\s*"
+  - "\\s*</tr>\\s*"
+  - "&nbsp;"
+formats:
+  - "DD-MMM-YYYY HH:mm"
+  - "YYYY-MMM-DD HH:mm"
+  - "M/D/YYYY h:mm A"
+  - "YYYY-MM-DD HH:mm"
+  - "dddd, MMMM DD, YYYY h:mm A"
+a2strptime:
+  'dddd': '%A'
+  'ddd': '%a'
+  'DD': '%d'
+  'D': '%d'
+  'MMMM': '%B'
+  'MMM': '%b'
+  'MM': '%m'
+  'M': '%m'
+  'YYYY': '%Y'
+  'HH': '%H'
+  'H': '%H'
+  'hh': '%I'
+  'h': '%I'
+  'A': '%p'
+  'a': '%p'
+  'mm': '%M'
+  'm': '%M'
+aliases:
+  :wget: "wget -c '{url}'"
+```
