@@ -1,5 +1,6 @@
-# scan-public-directory 
+![Logo](/logo.jpg?raw=true)
 
+# scan-public-directory 
 
 `scan-public-directory` is a tool to extract links from a specified public directory returned by a web server.
 
