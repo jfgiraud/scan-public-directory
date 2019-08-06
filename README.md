@@ -9,7 +9,7 @@ It permits :
 
 ## page source
 
-[Capture](./capture.jpg?raw=true)
+[logo](./capture.jpg?raw=true)
 
 ## command result
 
