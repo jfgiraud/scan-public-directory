@@ -1,4 +1,3 @@
-![Logo](/logo.jpg?raw=true)
 
 # scan-public-directory 
 
@@ -10,28 +9,15 @@ It permits :
 
 ## page source
 
-```
-Index of /images
-
-Icon  Name                    Last modified      Size  Description[DIR] Parent Directory                             -   
-[IMG] 02-09.jpg               01-Feb-2009 11:13  2.4K  
-[IMG] 021110.jpg              03-Nov-2010 10:36  3.4K  
-[IMG] 03-07.jpg               01-Mar-2007 08:21  4.1K  
-[IMG] 03-08.jpg               01-Mar-2008 08:51  2.5K  
-[IMG] 04-06.jpg               03-Apr-2006 12:13  6.2K  
-[IMG] 04-08.jpg               31-Mar-2008 20:14  7.1K  
-```
+[Capture](./capture.jpg?raw=true)
 
 ## command result
-```
-$ ./scan-public-directory url http://example.net/images/ | head
-2009-02-01 11:13|2.4K|http://example.net/images/02-09.jpg
-2010-11-03 10:36|3.4K|http://example.net/images/021110.jpg
-2007-03-01 08:21|4.1K|http://example.net/images/03-07.jpg
-2008-03-01 08:51|2.5K|http://example.net/images/03-08.jpg
-2006-04-03 12:13|6.2K|http://example.net/images/04-06.jpg
-2008-03-31 20:14|7.1K|http://example.net/images/04-08.jpg
 
+```
+$ ./scan-public-directory url http://example.com/images/ | head
+2009-02-01 11:13|2.4M|http://example.net/images/02-09.jpg
+2010-11-03 10:36|3.4M|http://example.net/images/021110.jpg
+2007-03-01 08:21|4.1M|http://example.net/images/03-07.jpg
 ```
 
 ## configuration file
@@ -133,23 +119,15 @@ optional arguments:
 ## examples
 
 ```bash
-$ ./scan-public-directory url http://www.example.com/Photos/ | tee photos.txt
-2015-12-25 19:33|324M|http://www.example.com/Photos/Photos-01.jpg
-2015-12-25 19:33|385M|http://www.example.com/Photos/Photos-02.jpg
-2015-12-25 19:33|400M|http://www.example.com/Photos/Photos-03.jpg
-2015-12-25 19:33|425M|http://www.example.com/Photos/Photos-04.jpg
-2015-12-25 19:34|400M|http://www.example.com/Photos/Photos-05.jpg
-2015-12-25 19:35|400M|http://www.example.com/Photos/Photos-06.jpg
-2015-12-25 19:35|400M|http://www.example.com/Photos/Photos-07.jpg
-2015-12-25 19:36|400M|http://www.example.com/Photos/Photos-08.jpg                 
+$ ./scan-public-directory url http://example.com/images/ | tee photo.txt
+2009-02-01 11:13|2.4M|http://example.net/images/02-09.jpg
+2010-11-03 10:36|3.4M|http://example.net/images/021110.jpg
+2007-03-01 08:21|4.1M|http://example.net/images/03-07.jpg
 ``` 
 
 ```bash
-./scan-public-directory file photo.txt --accept '*-0*' --before '2015-12-25 19:34' --max-size '201M'
-2015-12-25 19:32|200M|http://www.example.com/Photos/Photos-02.jpg
-2015-12-25 19:31|200M|http://www.example.com/Photos/Photos-04.jpg
-2015-12-25 19:32|200M|http://www.example.com/Photos/Photos-05.jpg
-2015-12-25 19:34|200M|http://www.example.com/Photos/Photos-07.jpg                 
+$ ./scan-public-directory file photo.txt --accept '*-0*' --before '2015-12-25 19:34' --max-size '3M'
+2009-02-01 11:13|2.4M|http://example.net/images/02-09.jpg
 ``` 
 
 If necessary, after filtering, you can call a shell command (see the `--exec` option in the usage)
