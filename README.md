@@ -79,14 +79,14 @@ optional arguments:
 
 ```bash
 $ ./scan-public-directory url http://example.com/images/ | tee photo.txt
-2009-02-01 11:13|2.4M|http://example.net/images/02-09.jpg
-2010-11-03 10:36|3.4M|http://example.net/images/021110.jpg
-2007-03-01 08:21|4.1M|http://example.net/images/03-07.jpg
+2009-02-01 11:13|2.4M|http://example.com/images/02-09.jpg
+2010-11-03 10:36|3.4M|http://example.com/images/021110.jpg
+2007-03-01 08:21|4.1M|http://example.com/images/03-07.jpg
 ``` 
 
 ```bash
 $ ./scan-public-directory file photo.txt --accept '*-0*' --before '2015-12-25 19:34' --max-size '3M'
-2009-02-01 11:13|2.4M|http://example.net/images/02-09.jpg
+2009-02-01 11:13|2.4M|http://example.com/images/02-09.jpg
 ``` 
 
 If necessary, after filtering, you can call a shell command (see the `--exec` option in the usage)
