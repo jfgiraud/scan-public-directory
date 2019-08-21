@@ -14,9 +14,9 @@ It permits :
 
 ```
 $ ./scan-public-directory url http://example.com/images/ 
-2009-02-01 11:13|2.4M|http://example.net/images/02-09.jpg
-2010-11-03 10:36|3.4M|http://example.net/images/021110.jpg
-2007-03-01 08:21|4.1M|http://example.net/images/03-07.jpg
+2009-02-01 11:13|2.4M|http://example.com/images/02-09.jpg
+2010-11-03 10:36|3.4M|http://example.com/images/021110.jpg
+2007-03-01 08:21|4.1M|http://example.com/images/03-07.jpg
 ```
 
 ## configuration file
